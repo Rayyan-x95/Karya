@@ -1,0 +1,111 @@
+import { supabase } from '../lib/supabaseClient';
+import { Project, ProjectWithClient, QueryOptions, PaginatedResult } from '../types';
+
+export class ProjectRepository {
+  static async getAll(
+    workspaceId: string,
+    options: QueryOptions = {}
+  ): Promise<PaginatedResult<ProjectWithClient>> {
+    const page = options.page || 1;
+    const pageSize = options.pageSize || 10;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    let query = supabase
+      .from('projects')
+      .select('*, clients(*)', { count: 'exact' })
+      .eq('workspace_id', workspaceId)
+      .is('deleted_at', null);
+
+    if (options.search) {
+      query = query.or(`name.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+    }
+
+    if (options.filter?.status) {
+      query = query.eq('status', options.filter.status);
+    }
+
+    if (options.filter?.client_id) {
+      query = query.eq('client_id', options.filter.client_id);
+    }
+
+    const sortBy = options.sortBy || 'created_at';
+    const sortOrder = options.sortOrder || 'desc';
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    const { data, error, count } = await query.range(from, to);
+
+    if (error) throw new Error(error.message);
+    
+    const total = count || 0;
+    return {
+      data: (data as ProjectWithClient[]) || [],
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  static async getById(workspaceId: string, id: string): Promise<ProjectWithClient | null> {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, clients(*), project_briefs(*), proposals(*), contracts(*)')
+      .eq('id', id)
+      .eq('workspace_id', workspaceId)
+      .is('deleted_at', null)
+      .single();
+
+    if (error) return null;
+    return data;
+  }
+
+  static async getByPortalToken(portalToken: string): Promise<ProjectWithClient | null> {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, clients(*), project_briefs(*), proposals(*), contracts(*), invoices(*)')
+      .eq('portal_token', portalToken)
+      .is('deleted_at', null)
+      .single();
+
+    if (error) return null;
+    return data;
+  }
+
+  static async create(workspaceId: string, projectData: Omit<Project, 'id' | 'workspace_id' | 'portal_token' | 'created_at' | 'updated_at' | 'deleted_at'>): Promise<Project> {
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({
+        ...projectData,
+        workspace_id: workspaceId,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  static async update(workspaceId: string, id: string, projectData: Partial<Project>): Promise<Project> {
+    const { data, error } = await supabase
+      .from('projects')
+      .update(projectData)
+      .eq('id', id)
+      .eq('workspace_id', workspaceId)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  static async softDelete(workspaceId: string, id: string): Promise<void> {
+    const { error } = await supabase
+      .from('projects')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('workspace_id', workspaceId);
+
+    if (error) throw new Error(error.message);
+  }
+}
