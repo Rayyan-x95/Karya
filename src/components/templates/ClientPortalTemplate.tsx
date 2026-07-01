@@ -175,7 +175,7 @@ export const ClientPortalTemplate: React.FC<ClientPortalProps> = ({ portalToken,
         <Badge variant="outline" size="sm">Secure client workspace</Badge>
         <h1 className="text-display text-foreground m-0">{project.name}</h1>
         <p className="text-body text-muted-foreground m-0">
-          Provided by <span className="text-foreground font-medium">{settings?.company_name || 'Rohan Sharma'}</span>
+          Provided by <span className="text-foreground font-medium">{settings?.company_name || 'Freelancer'}</span>
         </p>
         <div className="pt-1">
           <ProjectStatusBadge status={project.status} />

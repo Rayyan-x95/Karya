@@ -257,6 +257,7 @@ interface WorkspaceViewProps {
   view: 'dashboard' | 'clients' | 'projects' | 'project-details' | 'invoices' | 'payments' | 'settings';
   workspaceId: string;
   profileId: string;
+  user: any;
   addToast: any;
   toasts: any[];
   dismissToast: any;
@@ -267,6 +268,7 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   view,
   workspaceId,
   profileId,
+  user,
   addToast,
   toasts,
   dismissToast,
@@ -285,6 +287,7 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({
         currentView={view === 'project-details' ? 'projects' : view}
         onViewChange={handleViewChange}
         breadcrumbs={['Karya Workspace', view.toUpperCase()]}
+        user={user}
       >
         <React.Suspense fallback={<div className="flex items-center justify-center p-24"><Spinner size="lg" /></div>}>
           {view === 'project-details' && projectId ? (
@@ -377,8 +380,8 @@ const RoutingRedirects = () => {
 
 function KaryaApp() {
   const [user, setUser] = useState<any | undefined>(undefined);
-  const [workspaceId, setWorkspaceId] = useState<string>('mock-workspace-uuid-1234');
-  const [profileId, setProfileId] = useState<string>('mock-user-uuid-1234-5678');
+  const [workspaceId, setWorkspaceId] = useState<string>('');
+  const [profileId, setProfileId] = useState<string>('');
 
   // Auth form states
   const [authEmail, setAuthEmail] = useState('');
@@ -562,6 +565,7 @@ function KaryaApp() {
   const workspaceProps = {
     workspaceId,
     profileId,
+    user,
     addToast,
     toasts,
     dismissToast,

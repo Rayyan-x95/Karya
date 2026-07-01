@@ -8,6 +8,7 @@ interface DashboardLayoutProps {
   currentView: string;
   onViewChange: (view: string) => void;
   breadcrumbs: string[];
+  user?: any;
 }
 
 const NAV_ITEMS = [
@@ -24,10 +25,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   currentView,
   onViewChange,
   breadcrumbs,
+  user,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Freelancer';
+  const userEmail = user?.email || '';
 
   const pageTitle = breadcrumbs[breadcrumbs.length - 1] || 'Workspace';
 
@@ -100,11 +105,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {expanded && <span className="text-body">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>}
           </button>
           <div className={`flex items-center gap-2.5 px-2.5 py-2 ${expanded ? '' : 'justify-center'}`}>
-            <Avatar name="Rohan Sharma" size="sm" />
+            <Avatar name={userName} size="sm" />
             {expanded && (
               <div className="min-w-0 animate-fade-in">
-                <p className="text-small font-medium text-foreground truncate m-0">Rohan Sharma</p>
-                <p className="text-[11px] text-muted-foreground truncate m-0">freelancer@karya.in</p>
+                <p className="text-small font-medium text-foreground truncate m-0">{userName}</p>
+                <p className="text-[11px] text-muted-foreground truncate m-0">{userEmail}</p>
               </div>
             )}
           </div>

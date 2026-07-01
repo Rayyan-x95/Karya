@@ -71,7 +71,7 @@ export const ProjectDetailsTemplate: React.FC<ProjectDetailsProps> = ({
     if (contract) {
       setContractContent(contract.content || '');
     } else if (project) {
-      setContractContent(`PROJECT SERVICES AGREEMENT\n\nThis agreement is made between Rohan Sharma ("Freelancer") and Client. \n\n1. Services: Freelancer will perform design/dev tasks as specified in the scope.\n2. Payment: A total payment of ₹${project.budget || 0} shall be paid.\n3. Intellectual Property: Upon final payment, IP transfers to the Client.`);
+      setContractContent(`PROJECT SERVICES AGREEMENT\n\nThis agreement is made between the Freelancer and the Client. \n\n1. Services: Freelancer will perform design/dev tasks as specified in the scope.\n2. Payment: A total payment of ₹${project.budget || 0} shall be paid.\n3. Intellectual Property: Upon final payment, IP transfers to the Client.`);
     }
   }, [contract, project]);
 
